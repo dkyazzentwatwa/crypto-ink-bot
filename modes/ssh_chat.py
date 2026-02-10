@@ -256,11 +256,10 @@ class SSHChatMode:
         params = list(sig.parameters.values())
 
         # Check if handler has an 'args' parameter (after 'self')
-        # and if it doesn't have a default value
         needs_args = False
         if len(params) > 1:  # Has params beyond 'self'
             second_param = params[1]
-            if second_param.name == "args" and second_param.default == inspect.Parameter.empty:
+            if second_param.name == "args":
                 needs_args = True
 
         if needs_args:
