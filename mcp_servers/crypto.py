@@ -390,6 +390,19 @@ async def handle_request(request: Dict) -> Dict:
     method = request.get("method")
     params = request.get("params", {})
 
+    # Handle initialize request (required by MCP protocol)
+    if method == "initialize":
+        return {
+            "protocolVersion": "2024-11-05",
+            "capabilities": {
+                "tools": {}
+            },
+            "serverInfo": {
+                "name": "crypto-mcp-server",
+                "version": "1.0.0"
+            }
+        }
+
     server = CryptoMCPServer()
 
     if method == "tools/list":

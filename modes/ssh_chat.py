@@ -284,18 +284,21 @@ class SSHChatMode:
             "session": "Session",
             "info": "Status & Info",
             "personality": "Personality",
+            "crypto": "Crypto & Trading",
             "play": "Play & Energy",
             "tasks": "Task Management",
+            "scheduler": "Scheduler",
             "system": "System",
             "display": "Display",
         }
 
-        for cat_key in ["session", "info", "personality", "play", "tasks", "system", "display"]:
+        for cat_key in ["session", "info", "personality", "crypto", "play", "scheduler", "system", "display"]:
             if cat_key in categories:
                 print(f"{Colors.BOLD}{category_titles.get(cat_key, cat_key.title())}:{Colors.RESET}")
                 for cmd in categories[cat_key]:
                     usage = f"/{cmd.name}"
-                    if cmd.name in ("face", "ask", "task", "done", "cancel", "delete", "schedule", "bash"):
+                    if cmd.name in ("face", "ask", "task", "done", "cancel", "delete", "schedule", "bash",
+                                   "price", "chart", "add", "remove", "alert", "top"):
                         usage += " <arg>"
                     print(f"  {usage:14} {cmd.description}")
                 print()
