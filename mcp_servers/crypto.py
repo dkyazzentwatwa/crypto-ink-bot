@@ -389,17 +389,22 @@ async def handle_request(request: Dict) -> Dict:
     """Handle MCP request."""
     method = request.get("method")
     params = request.get("params", {})
+    request_id = request.get("id")  # Get request ID for JSON-RPC response
 
     # Handle initialize request (required by MCP protocol)
     if method == "initialize":
         return {
-            "protocolVersion": "2024-11-05",
-            "capabilities": {
-                "tools": {}
-            },
-            "serverInfo": {
-                "name": "crypto-mcp-server",
-                "version": "1.0.0"
+            "jsonrpc": "2.0",
+            "id": request_id,
+            "result": {
+                "protocolVersion": "2024-11-05",
+                "capabilities": {
+                    "tools": {}
+                },
+                "serverInfo": {
+                    "name": "crypto-mcp-server",
+                    "version": "1.0.0"
+                }
             }
         }
 
@@ -407,7 +412,10 @@ async def handle_request(request: Dict) -> Dict:
 
     if method == "tools/list":
         return {
-            "tools": [
+            "jsonrpc": "2.0",
+            "id": request_id,
+            "result": {
+                "tools": [
                 {
                     "name": "crypto_price",
                     "description": "Get current price for a cryptocurrency (BTC, ETH, SOL, etc.)",
@@ -496,6 +504,7 @@ async def handle_request(request: Dict) -> Dict:
                     }
                 },
             ]
+            }
         }
 
     elif method == "tools/call":
@@ -504,12 +513,32 @@ async def handle_request(request: Dict) -> Dict:
 
         handler = getattr(server, tool_name, None)
         if not handler:
-            return {"error": f"Unknown tool: {tool_name}"}
+            return {
+                "jsonrpc": "2.0",
+                "id": request_id,
+                "error": {
+                    "code": -32000,
+                    "message": f"Unknown tool: {tool_name}"
+                }
+            }
 
         result = await handler(**tool_args)
-        return {"content": [{"type": "text", "text": json.dumps(result, indent=2)}]}
+        return {
+            "jsonrpc": "2.0",
+            "id": request_id,
+            "result": {
+                "content": [{"type": "text", "text": json.dumps(result, indent=2)}]
+            }
+        }
 
-    return {"error": "Unknown method"}
+    return {
+        "jsonrpc": "2.0",
+        "id": request_id,
+        "error": {
+            "code": -32601,
+            "message": "Unknown method"
+        }
+    }
 
 
 async def main():
